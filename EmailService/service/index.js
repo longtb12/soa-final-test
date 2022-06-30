@@ -1,6 +1,7 @@
 require("dotenv").config();
 const Joi = require('@hapi/joi')
 var nodemailer = require('nodemailer');
+var global = []
 
 var transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
@@ -14,6 +15,7 @@ var transporter = nodemailer.createTransport({
 
 function schemaMail() {
     return {
+        task_id: Joi.number().required(),
         to: Joi.string().required(),
         subject: Joi.string().required(),
         text: Joi.string().required()
@@ -34,6 +36,12 @@ async function sendMail(params) {
         }
     }
     try {
+        global.push({
+            taskId: body.task_id,
+            status: 'Done',
+            message: ''
+        })
+
         var mailOptions = {
             from: process.env.EMAIL_USER,
             to: body.to,
@@ -62,4 +70,20 @@ async function sendMail(params) {
     }
 }
 
-module.exports = { sendMail }
+
+async function checkStatus(params) {
+    const {body} = params
+    const task = global.find(x => x.taskId == body.task_id);
+    if(task == undefined || task == null) {
+        return {
+            status: 'No'
+        };
+    }
+    return {
+        status: task.status,
+        message: task.message
+    };
+}
+
+
+module.exports = { sendMail, checkStatus }

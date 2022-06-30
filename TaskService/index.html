@@ -1,81 +1,168 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <style>
-input[type=text], select {
-    width: 30%;
-    padding: 1px 1px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+  <style>
+    input[type=text],
+    select {
+      width: 30%;
+      padding: 1px 1px;
+      margin: 8px 0;
+      display: inline-block;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
 
-input[type=submit] {
-    width: 100%;
-    background-color: #4CAF50;
-    color: white;
-    padding: 4px 4px;
-    margin: 8px 0;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
+    input[type=submit] {
+      width: 100%;
+      background-color: #4CAF50;
+      color: white;
+      padding: 4px 4px;
+      margin: 8px 0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
 
-input[type=submit]:hover {
-    background-color: #45a049;
-}
+    input[type=submit]:hover {
+      background-color: #45a049;
+    }
 
-div {
-    border-radius: 5px;
-    background-color: #f2f2f2;
-    padding: 5px;
-}
-</style> 
+    div {
+      border-radius: 5px;
+      background-color: #f2f2f2;
+      padding: 5px;
+    }
+  </style>
 </head>
+
 <body>
 
-<body class="home_body">
+  <body class="home_body">
 
-<div class="container">
-  <div class="home_header header"><h3>Borrower and Book Information</h3></div>
-  <form action="insert-borrower-info.php" method="post" class="bookinsert">
-    <div class="insert-input">
-      <label>Book ISDN:</label></br>
-      <input type="text" placeholder="Enter book ID" name="book_id" value="">      
-    </div>
-    <div class="insert-input">    
-    <label>Book Title:</label></br>
-    <input type="text" placeholder="Enter book title" name="book_title" value="">
-    </div>
-    <div class="insert-input">
-      <label>Borrower ID:</label></br>
-      <input type="text" placeholder="Enter Student's ID" name="sid" value="">      
-    </div>
-    
-    <div class="insert-input">
-    <label>Borrower Name:  </label></br>
-    <input type="text" placeholder="Enter Borrower's name" name="borrower" value="">
-    </div>
+    <div class="container">
+      <div class="home_header header">
+        <h3>Borrower and Book Information</h3>
+      </div>
+      <form method="POST" id="form">
+        <div class="insert-input">
+          <label>Book ID:</label></br>
+          <input type="text" id="book_id" placeholder="Enter book ID" name="book_id" value="">
+        </div>
+        <div class="insert-input">
+          <label>Book Title:</label></br>
+          <input type="text" id="book_title" placeholder="Enter book title" name="book_title" value="">
+        </div>
+        <div class="insert-input">
+          <label>Borrower Email:</label></br>
+          <input type="text" id="borrow_email" placeholder="Enter email" name="sid" value="">
+        </div>
 
-    <div class="insert-input">
-    <label>Borrowing Date:  </label></br>
-     <input type="date" name="borrow_date">
+        <div class="insert-input">
+          <label>Borrower Name: </label></br>
+          <input type="text" id="borrow_name" placeholder="Enter Borrower's name" name="borrower" value="">
+        </div>
+
+        <div class="insert-input">
+          <label>Borrowing Date: </label></br>
+          <input type="datetime-local" id="borrow_date" name="borrow_date">
+        </div>
+
+        <div class="insert-input">
+          <label>Return Date: </label></br>
+          <input type="datetime-local" id="return_date" name="back_date">
+        </div>
+
+        <input type="submit" value="Insert">
+      </form>
+
+      <div>Order Service <p id="order-status"></p>
+      </div>
+      <div>Reminder Service <p id="reminder-status"></p>
+      </div>
+      <div>Email Service <p id="email-status"></p>
+      </div>
+
     </div>
- 
-    <div class="insert-input">
-     <label>Return Date: </label></br>
-     <input type="date" name="back_date">
-    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script>
+      let form = document.getElementById('form'); // selecting the form
 
-    <input type="submit" value="Insert"> 
-  </form>
+      form.addEventListener('submit', function (event) { // 1
+        event.preventDefault()
 
-<div class="bookinfo">
-   
-</div>  
-</div>
+        let data = new FormData(); // 2
 
-</body>
+        book_id = document.getElementById('book_id').value
+        book_title = document.getElementById('book_title').value
+        borrow_email = document.getElementById('borrow_email').value
+        borrow_name = document.getElementById('borrow_name').value
+        borrow_date = document.getElementById('borrow_date').value
+        return_date = document.getElementById('return_date').value
+
+        borrow_date = new Date(borrow_date)
+        return_date = new Date(return_date)
+        var task_id = Math.random()
+
+        var req = {
+          task_id,
+          borrow_name,
+          borrow_date,
+          return_date,
+          book_title,
+          borrow_email,
+          book_id
+        }
+
+        axios.post('http://localhost:8000/order', req) // 4
+          .then(res => {
+            alert("Task Submitted")
+            var reqReminder = {
+              task_id,
+              returnDate: return_date,
+              borrow_email
+            }
+            axios.post('http://localhost:8000/reminder', reqReminder)
+            checkStatus(task_id)
+          }) // 5
+          .catch(errors => {
+            console.log(errors)
+            alert("Error!")
+          }) // 6
+
+      })
+
+      function sleep(ms) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+      }
+
+      async function checkStatus(task_id) {
+        while (true) {
+          req = {
+            task_id
+          };
+          axios.post('http://localhost:8000/order/status', req) // 4
+            .then(res => {
+              debugger
+              document.getElementById("order-status").innerHTML = res.data.status;
+            })
+
+          axios.post('http://localhost:8000/reminder/status', req) // 4
+            .then(res => {
+              document.getElementById("reminder-status").innerHTML = res.data.status + ' ' + res.data.message;
+            })
+
+          axios.post('http://localhost:8000/email/status', req) // 4
+            .then(res => {
+              document.getElementById("email-status").innerHTML = res.data.status;
+            })
+
+          await sleep(1000)
+        }
+      }
+
+    </script>
+  </body>
+
 </html>

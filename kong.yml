@@ -1,0 +1,38 @@
+_format_version: "2.1"
+
+services:
+  - name: order-service
+    url: http://host.docker.internal:6666/order
+    routes:
+      - name: order-service
+        paths:
+          - /order
+
+  - name: reminder-service
+    url: http://host.docker.internal:5555/reminder
+    routes:
+      - name: reminder-service
+        paths:
+          - /reminder
+
+  - name: status-reminder-service
+    url: http://host.docker.internal:5555/status
+    routes:
+      - name: reminder-status-service
+        paths:
+          - /reminder/status
+
+  - name: email-service
+    url: http://host.docker.internal:4444/status
+    routes:
+      - name: email-status-service
+        paths:
+          - /email/status
+
+  - name: status-order-service
+    url: http://host.docker.internal:6666/status
+    routes:
+      - name: order-status-service
+        paths:
+          - /order/status
+  

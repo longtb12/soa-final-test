@@ -2,18 +2,26 @@ require("dotenv").config();
 const express = require("express");
 const app = express();
 const port = 4444;
-const {sendMail} = require('./service/index')
+const {sendMail, checkStatus} = require('./service/index')
+const cors = require('cors')
 
+app.use(cors())
 app.use(express.json());
 app.use(
   express.urlencoded({
     extended: true,
   })
 );
-app.post("/send-email", async (req, res) => {
+app.post("/email", async (req, res) => {
   const data = await sendMail(req)
   res.json(data);
 });
+
+app.post("/status", async (req, res) => {
+  const data = await checkStatus(req)
+  res.json(data);
+});
+
 app.listen(process.env.PORT||port, () => {
   console.log(`Example app listening at http://localhost:${port}`);
 });
