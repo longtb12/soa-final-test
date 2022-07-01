@@ -1,6 +1,20 @@
 _format_version: "2.1"
 
 services:
+  - name: task-service
+    url: http://host.docker.internal:5000
+    routes:
+      - name: task-service
+        paths:
+          - /task
+
+  - name: email-service
+    url: http://host.docker.internal:4444/email
+    routes:
+      - name: email-service
+        paths:
+          - /email
+
   - name: order-service
     url: http://host.docker.internal:6666/order
     routes:
@@ -22,7 +36,7 @@ services:
         paths:
           - /reminder/status
 
-  - name: email-service
+  - name: email-status-service
     url: http://host.docker.internal:4444/status
     routes:
       - name: email-status-service

@@ -1,6 +1,6 @@
 const moment = require('moment');
 const apiAdapter = require('./apiAdapter')
-const api = apiAdapter('http://localhost:4444')
+const api = apiAdapter('http://localhost:8000')
 var global = []
 
 function sleep(ms) {
